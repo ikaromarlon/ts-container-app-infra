@@ -13,7 +13,7 @@ variable "ecs_task_name" {
   type        = string
 }
 
-variable "esc_service_name" {
+variable "ecs_service_name" {
   description = "ECS Service Name"
   type        = string
 }

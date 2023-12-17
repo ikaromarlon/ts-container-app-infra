@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
 }
 
 resource "aws_ecs_service" "esc_service" {
-  name            = var.esc_service_name
+  name            = var.ecs_service_name
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.ecs_task.arn
   launch_type     = "FARGATE"

@@ -12,6 +12,9 @@ jobs:
   terraform:
     name: Terraform
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -30,9 +33,18 @@ jobs:
       id: fmt
       run: terraform fmt
 
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Actions"
+        git add .
+        git diff-index --quiet HEAD || git commit -m "refactor(github-action): auto lint"
+        git push
+
     - name: Terraform Validate
       id: validate
-      run: terraform validate -no-color
+      # run: terraform validate -no-color
+      run: terraform validate
 
     - name: Terraform Plan
       id: plan
