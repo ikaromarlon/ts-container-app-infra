@@ -1,12 +1,13 @@
 name: CI/CD
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
 
 jobs:
   terraform:
@@ -16,39 +17,39 @@ jobs:
       contents: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        
+      - name: Terraform Init
+        id: init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform init
       
-    - name: Terraform Init
-      id: init
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: terraform init
-    
-    - name: Terraform Format
-      id: fmt
-      run: terraform fmt
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt
 
-    - name: Commit changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Actions"
-        git add .
-        git diff-index --quiet HEAD || git commit -m "refactor(github-action): auto lint"
-        git push
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "refactor(github-action): auto lint"
+          git push
 
-    - name: Terraform Validate
-      id: validate
-      # run: terraform validate -no-color
-      run: terraform validate
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
 
-    - name: Terraform Plan
-      id: plan
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: terraform plan
+      - name: Terraform Plan
+        id: plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform plan
+        # run: terraform plan -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }} -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}
